@@ -32,6 +32,11 @@ class ProductDeleteView(generics.DestroyAPIView):
         user = self.request.user
         return Product.objects.filter(seller=user)
     
+class ProductListView(generics.ListAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = ProductSerializer
+    queryset = Product.objects.filter(archived=False)
+
 class UserRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
