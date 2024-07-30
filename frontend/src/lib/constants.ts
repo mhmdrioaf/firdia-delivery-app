@@ -13,8 +13,9 @@ export const ApiEndpoint = {
     Register: BASE_URL + "/api/user/register/",
   },
   Product: {
-    List: BASE_URL + "/api/products/",
-    Create: BASE_URL + "/api/products/",
+    List: BASE_URL + "/api/products/seller/",
+    Create: BASE_URL + "/api/products/seller/",
     Delete: BASE_URL + "/api/products/delete/",
+    All: BASE_URL + "/api/products/",
   },
 };
