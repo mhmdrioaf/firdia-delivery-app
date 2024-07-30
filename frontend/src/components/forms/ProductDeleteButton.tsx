@@ -1,17 +1,21 @@
 "use client";
 
 import { Loader2Icon, Trash2Icon } from "lucide-react";
-import { useFormStatus } from "react-dom";
 import { Button } from "../ui/button";
 
-export default function ProductDeleteButton() {
-  const { pending } = useFormStatus();
+interface IProductDeleteButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+
+export default function ProductDeleteButton({
+  children,
+  ...props
+}: IProductDeleteButtonProps) {
   return (
-    <Button type="submit" size="icon" disabled={pending} variant="destructive">
-      {pending ? (
-        <Loader2Icon className="w-4 h-4 animate-spin" />
+    <Button type="submit" size="icon" variant="destructive" {...props}>
+      {props.disabled ? (
+        <Loader2Icon className="h-4 w-4 animate-spin" />
       ) : (
-        <Trash2Icon className="w-4 h-4" />
+        <Trash2Icon className="h-4 w-4" />
       )}
     </Button>
   );

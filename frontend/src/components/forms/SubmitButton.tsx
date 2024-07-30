@@ -4,19 +4,23 @@ import { Loader2Icon } from "lucide-react";
 import { useFormStatus } from "react-dom";
 import { Button } from "../ui/button";
 
+interface ISubmitButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+
 export default function SubmitButton({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+  ...props
+}: ISubmitButtonProps) {
   const { pending } = useFormStatus();
   return (
     <Button
       type="submit"
-      disabled={pending}
-      className="w-full disabled:bg-neutral-100 disabled:text-neutral-800 bg-neutral-950 text-neutral-50"
+      disabled={pending || props.disabled}
+      className="w-full bg-neutral-950 text-neutral-50 disabled:bg-neutral-100 disabled:text-neutral-800"
     >
-      {pending && <Loader2Icon className="w-4 h-4 mr-2 animate-spin" />}
+      {(pending || props.disabled) && (
+        <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+      )}
       {children}
     </Button>
   );
