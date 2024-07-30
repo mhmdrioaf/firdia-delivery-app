@@ -4,6 +4,7 @@ export type TProductResponse = {
 
 export type TProduct = {
   id: number;
+  image: string;
   slug: string;
   title: string;
   archived: boolean;
@@ -12,7 +13,12 @@ export type TProduct = {
   seller: number;
 };
 
-export type TProductDto = Omit<TProduct, "id" | "created_at" | "seller">;
+export type TProductDto = Omit<
+  TProduct,
+  "id" | "created_at" | "seller" | "image" | "slug"
+> & {
+  image?: File;
+};
 
 export type TProductApiResponse = {
   status: ProductApiStatus;
