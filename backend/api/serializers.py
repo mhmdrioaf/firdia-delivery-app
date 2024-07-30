@@ -5,8 +5,9 @@ from .models import Product
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'slug', 'title', 'archived', 'description', 'created_at', 'seller']
-        extra_kwargs = {"seller": {"read_only": True}}
+        fields = ['id', 'title', 'image', 'archived', 'description', 'created_at', 'seller', 'slug']
+        extra_kwargs = {"seller": {"read_only": True}, "slug": {"read_only": True}}
+        
         
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
