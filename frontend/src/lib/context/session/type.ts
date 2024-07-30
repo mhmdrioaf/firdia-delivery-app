@@ -14,3 +14,9 @@ export enum SessionStatus {
 export type TSessionCookie = {
   [key: string]: string;
 };
+
+declare module "jwt-decode" {
+  export interface JwtPayload {
+    user_id: number;
+  }
+}
