@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect, RedirectType } from "next/navigation";
 import { ApiEndpoint } from "../constants";
 import { getSession } from "./auth";
@@ -7,8 +8,6 @@ import {
   ProductApiStatus,
   TProduct,
   TProductApiResponse,
-  TProductDeleteResponse,
-  TProductDto,
 } from "./product-type";
 
 export async function listProducts() {
@@ -35,17 +34,9 @@ export async function listProducts() {
 }
 
 export async function createProduct(
-  prevState: TProductApiResponse,
-  formData: FormData
-) {
+  formData: FormData,
+): Promise<TProductApiResponse> {
   const session = await getSession();
-
-  const productDto: TProductDto = {
-    archived: formData.get("archived") === "true",
-    description: formData.get("description") as string,
-    slug: formData.get("slug") as string,
-    title: formData.get("title") as string,
-  };
 
   if (session === null) redirect("/auth/login", RedirectType.replace);
 
@@ -53,36 +44,37 @@ export async function createProduct(
     const res = await fetch(ApiEndpoint.Product.Create, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${session.access}`,
       },
-      body: JSON.stringify(productDto),
+      body: formData,
     });
 
     const response = await res.json();
     if (res.status === 201) {
-      prevState.message = "Berhasil menambahkan produk baru.";
-      prevState.product = response.product;
-      prevState.status = ProductApiStatus.Success;
+      revalidatePath("/", "page");
+      return {
+        message: "Berhasil menambahkan produk baru.",
+        product: response.product,
+        status: ProductApiStatus.Success,
+      };
     } else {
-      prevState.message = "Terjadi kesalahan ketika menambahkan produk.";
-      prevState.product = null;
-      prevState.status = ProductApiStatus.Failed;
+      return {
+        message: "Terjadi kesalahan ketika menambahkan produk.",
+        product: null,
+        status: ProductApiStatus.Failed,
+      };
     }
   } catch (error) {
     console.error(error);
-    prevState.message = "Terjadi kesalahan ketika menambahkan produk.";
-    prevState.product = null;
-    prevState.status = ProductApiStatus.Failed;
-  } finally {
-    return prevState;
+    return {
+      message: "Terjadi kesalahan ketika menambahkan produk.",
+      product: null,
+      status: ProductApiStatus.Failed,
+    };
   }
 }
 
-export async function deleteProduct(
-  productId: number,
-  prevState: TProductDeleteResponse
-) {
+export async function deleteProduct(productId: number) {
   const session = await getSession();
 
   if (session === null) redirect("/auth/login", RedirectType.replace);
@@ -96,17 +88,33 @@ export async function deleteProduct(
     });
 
     if (res.status === 204) {
-      prevState.message = "Berhasil menghapus produk.";
-      prevState.status = ProductApiStatus.Success;
+      revalidatePath("/", "page");
+      return {
+        message: "Berhasil menghapus produk.",
+        status: ProductApiStatus.Success,
+      };
     } else {
-      prevState.message = "Terjadi kesalahan ketika menghapus data produk.";
-      prevState.status = ProductApiStatus.Failed;
+      return {
+        message: "Terjadi kesalahan ketika menghapus data produk.",
+        status: ProductApiStatus.Failed,
+      };
     }
   } catch (error) {
     console.error(error);
-    prevState.message = "Terjadi kesalahan ketika menghapus data produk.";
-    prevState.status = ProductApiStatus.Failed;
-  } finally {
-    return prevState;
+    return {
+      message: "Terjadi kesalahan ketika menghapus data produk.",
+      status: ProductApiStatus.Failed,
+    };
+  }
+}
+
+export async function listAllProducts() {
+  try {
+    const res = await fetch(ApiEndpoint.Product.All);
+    const response: TProduct[] = await res.json();
+    return response;
+  } catch (error) {
+    console.error(error);
+    return [];
   }
 }
