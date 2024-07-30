@@ -4,12 +4,14 @@ from .models import Product
 from .serializers import ProductSerializer, UserSerializer
 
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from django.contrib.auth.models import User
 
 class ProductListCreateView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
     
     def get_queryset(self):
         user = self.request.user
